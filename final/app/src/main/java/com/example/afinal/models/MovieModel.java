@@ -1,8 +1,11 @@
 package com.example.afinal.models;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
 import com.google.gson.annotations.SerializedName;
 
-public class MovieModel {
+public class MovieModel implements Parcelable {
     @SerializedName("title")
     private String title;
 
@@ -29,6 +32,48 @@ public class MovieModel {
 
     @SerializedName("vote_average")
     private String vote_average;
+
+    protected MovieModel(Parcel in) {
+        title = in.readString();
+        id = in.readString();
+        original_title = in.readString();
+        overview = in.readString();
+        popularity = in.readString();
+        release_date = in.readString();
+        poster_path = in.readString();
+        backdrop_path = in.readString();
+        vote_average = in.readString();
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(title);
+        dest.writeString(id);
+        dest.writeString(original_title);
+        dest.writeString(overview);
+        dest.writeString(popularity);
+        dest.writeString(release_date);
+        dest.writeString(poster_path);
+        dest.writeString(backdrop_path);
+        dest.writeString(vote_average);
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    public static final Creator<MovieModel> CREATOR = new Creator<MovieModel>() {
+        @Override
+        public MovieModel createFromParcel(Parcel in) {
+            return new MovieModel(in);
+        }
+
+        @Override
+        public MovieModel[] newArray(int size) {
+            return new MovieModel[size];
+        }
+    };
 
     public String getTitle() {
         return title;

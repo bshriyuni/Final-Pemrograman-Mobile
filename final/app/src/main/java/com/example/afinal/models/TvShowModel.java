@@ -1,8 +1,13 @@
 package com.example.afinal.models;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
+import androidx.annotation.NonNull;
+
 import com.google.gson.annotations.SerializedName;
 
-public class TvShowModel {
+public class TvShowModel implements Parcelable {
     @SerializedName("name")
     private String name;
 
@@ -23,6 +28,28 @@ public class TvShowModel {
 
     @SerializedName("vote_average")
     private String vote_average;
+
+    protected TvShowModel(Parcel in) {
+        name = in.readString();
+        id = in.readString();
+        poster_path = in.readString();
+        first_air_date = in.readString();
+        backdrop_path = in.readString();
+        overview = in.readString();
+        vote_average = in.readString();
+    }
+
+    public static final Creator<TvShowModel> CREATOR = new Creator<TvShowModel>() {
+        @Override
+        public TvShowModel createFromParcel(Parcel in) {
+            return new TvShowModel(in);
+        }
+
+        @Override
+        public TvShowModel[] newArray(int size) {
+            return new TvShowModel[size];
+        }
+    };
 
     public String getName() {
         return name;
@@ -78,5 +105,21 @@ public class TvShowModel {
 
     public void setVote_average(String vote_average) {
         this.vote_average = vote_average;
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(@NonNull Parcel parcel, int i) {
+        parcel.writeString(name);
+        parcel.writeString(id);
+        parcel.writeString(poster_path);
+        parcel.writeString(first_air_date);
+        parcel.writeString(backdrop_path);
+        parcel.writeString(overview);
+        parcel.writeString(vote_average);
     }
 }

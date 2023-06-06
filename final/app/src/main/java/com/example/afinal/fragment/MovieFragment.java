@@ -1,14 +1,6 @@
 package com.example.afinal.fragment;
 
 import android.os.Bundle;
-
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.fragment.app.Fragment;
-import androidx.recyclerview.widget.GridLayoutManager;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -16,6 +8,12 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.GridLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.afinal.R;
 import com.example.afinal.adapter.AdapterMovie;
@@ -31,7 +29,6 @@ public class MovieFragment extends Fragment {
     private AdapterMovie adapterMovie;
     RecyclerView rv;
     private LinearLayout ll_reload;
-    private ImageView iv_loading;
     private ProgressBar progressBar;
 
     @Override
@@ -44,7 +41,7 @@ public class MovieFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
         rv = view.findViewById(R.id.rv_movie);
         ll_reload = view.findViewById(R.id.reload);
-        iv_loading = view.findViewById(R.id.loading);
+        ImageView iv_loading = view.findViewById(R.id.loading);
         progressBar = view.findViewById(R.id.progressBar);
         adapterMovie = new AdapterMovie();
 
@@ -52,33 +49,30 @@ public class MovieFragment extends Fragment {
         progressBar.setVisibility(View.VISIBLE);
 
         fetchAPI();
-        iv_loading.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                progressBar.setVisibility(View.VISIBLE);
-                fetchAPI();
-            }
+        iv_loading.setOnClickListener(view1 -> {
+            progressBar.setVisibility(View.VISIBLE);
+            fetchAPI();
         });
     }
 
     private void fetchAPI() {
-        if (NetworkUtil.isNetworkAvailable(getActivity())){
+        if (NetworkUtil.isNetworkAvailable(requireActivity())){
             ApiConfig.getApiService().getMovie(ApiConfig.getApiKey()).enqueue(new Callback<Movie>(){
                 @Override
-                public void onResponse(Call<Movie> call, Response<Movie> response) {
+                public void onResponse(@NonNull Call<Movie> call, @NonNull Response<Movie> response) {
                     if (response.isSuccessful() && response.body() != null){
                         adapterMovie.addUser(response.body().getMovie());
                         rv.setAdapter(adapterMovie);
                         int numberOfColumns = 2; // Jumlah kolom yang diinginkan
                         GridLayoutManager layoutManager = new GridLayoutManager(getActivity(), numberOfColumns);
-                        rv.setLayoutManager(layoutManager);
+                        rv.setLayoutManager(layoutManager  );
 
                         ll_reload.setVisibility(View.GONE);
                         progressBar.setVisibility(View.GONE);
                     }
                 }
                 @Override
-                public void onFailure(Call<Movie> call, Throwable t) {
+                public void onFailure(@NonNull Call<Movie> call, @NonNull Throwable t) {
                     Log.e("MainActivity", "onFailure: " + t.getMessage());
                 }
             });

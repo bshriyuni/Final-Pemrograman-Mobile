@@ -16,22 +16,24 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:layout_marginTop="350dp">
+        android:layout_marginTop="350dp"
+        tools:ignore="UseCompoundDrawables">
 
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:textColor="@color/black"
             android:gravity="center"
             android:text="Please check your internet connection"
-            android:textSize="20dp" />
+            android:textColor="@color/black"
+            android:textSize="20dp"
+            tools:ignore="HardcodedText,SpUsage,TextSizeCheck,TextSizeCheck" />
 
         <ImageView
             android:id="@+id/loading"
-            app:tint="@color/black"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:src="@drawable/baseline_replay_24"/>
+            android:src="@drawable/baseline_replay_24"
+            tools:ignore="ContentDescription" />
     </LinearLayout>
 
     <ProgressBar
