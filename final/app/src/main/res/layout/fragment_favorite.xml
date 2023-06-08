@@ -11,4 +11,35 @@
         android:layout_height="wrap_content"
         tools:listitem="@layout/favorite_item"/>
 
+    <LinearLayout
+        android:id="@+id/reload"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_marginTop="350dp"
+        tools:ignore="UseCompoundDrawables">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:text="Please check your internet connection"
+            android:textColor="@color/black"
+            android:textSize="20dp"
+            tools:ignore="HardcodedText,SpUsage,TextSizeCheck,TextSizeCheck" />
+
+        <ImageView
+            android:id="@+id/loading"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:src="@drawable/baseline_replay_24"
+            tools:ignore="ContentDescription" />
+    </LinearLayout>
+
+    <ProgressBar
+        android:id="@+id/progressBar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"/>
+
 </FrameLayout>

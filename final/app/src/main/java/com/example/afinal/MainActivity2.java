@@ -1,6 +1,7 @@
 package com.example.afinal;
 
 import android.annotation.SuppressLint;
+import android.content.ContentValues;
 import android.content.Intent;
 import android.os.Bundle;
 import android.widget.ImageView;
@@ -10,10 +11,19 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.cardview.widget.CardView;
 
 import com.bumptech.glide.Glide;
+import com.example.afinal.database.DatabaseContract;
+import com.example.afinal.helper.FavoriteHelper;
+import com.example.afinal.models.FavoriteModel;
 import com.example.afinal.models.MovieModel;
 import com.example.afinal.models.TvShowModel;
 
 public class MainActivity2 extends AppCompatActivity {
+    FavoriteHelper favoriteHelper;
+    public static final String EXTRA_FAVORITE = "extra_favorite";
+    public static final int RESULT_ADD = 101;
+    public static final int RESULT_UPDATE = 201;
+    public static final int RESULT_DELETE = 301;
+    private FavoriteModel favoriteModel;
 
     @SuppressLint("MissingInflatedId")
     @Override
@@ -31,9 +41,14 @@ public class MainActivity2 extends AppCompatActivity {
         CardView cv_fav = findViewById(R.id.cv_favdetail);
         ImageView iv_jenis = findViewById(R.id.iv_jenis);
 
+        // Menginisialisasi NotesHelper dan membuka koneksi database
+        favoriteHelper = FavoriteHelper.getInstance(getApplicationContext());
+        favoriteHelper.open();
+        // Mendapatkan data Notes yang dikirim melalui Intent
+        favoriteModel = getIntent().getParcelableExtra(EXTRA_FAVORITE);
+
         Intent intent = getIntent();
         if (intent.getParcelableExtra("movie") != null){
-            System.out.println("tidak kosong");
             MovieModel movieModel = intent.getParcelableExtra("movie");
             tv_judul.setText(movieModel.getTitle());
             tv_tayang.setText(movieModel.getRelease_date());
@@ -52,9 +67,24 @@ public class MainActivity2 extends AppCompatActivity {
                     .placeholder(R.drawable.baseline_image_search_24) // placeholder image saat sedang memuat
                     .error(R.drawable.baseline_image_24) // gambar yang ditampilkan jika terjadi kesalahan
                     .into(iv_backdrop);
+
+            cv_fav.setOnClickListener(view -> {
+                favoriteModel.setJudul(movieModel.getTitle());
+                favoriteModel.setPoster(movieModel.getPoster_path());
+                favoriteModel.setTahun(movieModel.getRelease_date());
+                favoriteModel.setJenis(R.drawable.baseline_movie_24p);
+
+                Intent kefavorite = new Intent();
+                kefavorite.putExtra(EXTRA_FAVORITE, favoriteModel);
+                ContentValues values = new ContentValues();
+                values.put(DatabaseContract.FavoriteColumns.TITLE, favoriteModel.getJudul());
+                values.put(DatabaseContract.FavoriteColumns.POSTER, favoriteModel.getPoster());
+                values.put(DatabaseContract.FavoriteColumns.TAHUN, favoriteModel.getTahun());
+                values.put(DatabaseContract.FavoriteColumns.JENIS, favoriteModel.getJenis());
+                finish();
+            });
         }
-        else {
-            System.out.println("kodsong");
+        else if(intent.getParcelableExtra("tvshow") != null){
             TvShowModel tvShowModel = intent.getParcelableExtra("tvshow");
             tv_judul.setText(tvShowModel.getName());
             tv_tayang.setText(tvShowModel.getFirst_air_date());
@@ -74,6 +104,27 @@ public class MainActivity2 extends AppCompatActivity {
                     .error(R.drawable.baseline_image_24) // gambar yang ditampilkan jika terjadi kesalahan
                     .into(iv_backdrop);
         }
+        else {
+            FavoriteModel favoriteModel1 = intent.getParcelableExtra("favorite");
+            tv_judul.setText(favoriteModel1.getJudul());
+            tv_tayang.setText(favoriteModel1.getTahun());
+            tv_vote.setText(favoriteModel1.getVote());
+            tv_overview.setText(favoriteModel1.getSinopsis());
+            String posterUrl = "https://image.tmdb.org/t/p/w500" + favoriteModel1.getPoster();
+            Glide.with(iv_poster.getContext())
+                    .load(posterUrl)
+                    .placeholder(R.drawable.baseline_image_search_24) // placeholder image saat sedang memuat
+                    .error(R.drawable.baseline_image_24) // gambar yang ditampilkan jika terjadi kesalahan
+                    .into(iv_poster);
+            String backdropUrl = "https://image.tmdb.org/t/p/w500" + favoriteModel1.getBackdrop();
+            Glide.with(iv_backdrop.getContext())
+                    .load(backdropUrl)
+                    .placeholder(R.drawable.baseline_image_search_24) // placeholder image saat sedang memuat
+                    .error(R.drawable.baseline_image_24) // gambar yang ditampilkan jika terjadi kesalahan
+                    .into(iv_backdrop);
+
+
+        }
 
         cv_back.setOnClickListener(view -> {
             Intent back = new Intent(MainActivity2.this, MainActivity.class);
@@ -81,9 +132,19 @@ public class MainActivity2 extends AppCompatActivity {
             finish();
         });
 
-        cv_fav.setOnClickListener(view -> {
-
-        });
+//        cv_fav.setOnClickListener(view -> {
+//            addfavorite();
+//        });
 
     }
+
+//    private void addfavorite(){
+//
+//        long result = FavoriteHelper.insert(values);
+//        if (result > 0){
+//            favoriteModel.setId((int) result);
+//            setResult(RESULT_ADD, kefavorite);
+//        }
+//
+//    }
 }

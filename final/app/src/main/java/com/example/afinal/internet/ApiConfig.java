@@ -1,7 +1,5 @@
 package com.example.afinal.internet;
 
-import android.accessibilityservice.MagnificationConfig;
-
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
