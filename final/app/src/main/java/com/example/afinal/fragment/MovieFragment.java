@@ -11,6 +11,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.SearchView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -87,6 +88,9 @@ public class MovieFragment extends Fragment{
                 String title = movie.getTitle().toLowerCase();
                 if (title.startsWith(lowerCaseQuery)) {
                     filteredData.add(movie);
+                }
+                else{
+                    Toast.makeText(getActivity(), "no data found", Toast.LENGTH_SHORT).show();
                 }
             }
         }
