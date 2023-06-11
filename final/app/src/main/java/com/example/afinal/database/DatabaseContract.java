@@ -9,8 +9,8 @@ public class DatabaseContract {
         public static String TAHUN = "tahun";
         public static String POSTER = "poster";
         public static String JENIS = "jenis";
-        public  static String BACKDROP = "backdrop";
-        public static  String VOTE = "vote";
-        public static String SINOPSIS = "sinopsis";
+        public static String BACKDROP = "backdrop";
+        public static String VOTE = "vote";
+        public static String SINOPSIS ="sinopsis";
     }
 }

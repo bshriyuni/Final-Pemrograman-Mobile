@@ -5,11 +5,29 @@
     android:layout_height="match_parent"
     tools:context=".fragment.MovieFragment">
 
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/rv_movie"
+    <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        tools:listitem="@layout/movie_item"/>
+        android:layout_height="wrap_content">
+        <SearchView
+            android:id="@+id/searcview"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:queryHint="Search"
+            android:layout_marginTop="6dp"
+            android:layout_marginBottom="5dp"
+            android:layout_marginLeft="5dp"
+            android:layout_marginRight="5dp"
+            android:background="@drawable/search_view"
+            android:iconifiedByDefault="false"/>
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rv_movie"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/searcview"
+            tools:listitem="@layout/movie_item" />
+    </RelativeLayout>
+
 
     <LinearLayout
         android:id="@+id/reload"

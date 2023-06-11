@@ -1,5 +1,6 @@
 package com.example.afinal.adapter;
 
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -19,9 +20,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class AdapterTvShow extends RecyclerView.Adapter<AdapterTvShow.ViewHolder> {
-    private final ArrayList<TvShowModel> datatv = new ArrayList<>();
-    public void addUser (List<TvShowModel> datatv) {
-        this.datatv.addAll(datatv);
+    private List<TvShowModel> datatv = new ArrayList<>();
+    @SuppressLint("NotifyDataSetChanged")
+    public void setFilteredList(List<TvShowModel> filteredList) {
+        datatv = filteredList;
+        notifyDataSetChanged();
     }
     @NonNull
     @Override

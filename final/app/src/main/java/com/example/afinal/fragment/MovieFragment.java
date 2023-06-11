@@ -1,6 +1,8 @@
 package com.example.afinal.fragment;
 
+import android.annotation.SuppressLint;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -8,6 +10,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
+import android.widget.SearchView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -20,17 +23,22 @@ import com.example.afinal.adapter.AdapterMovie;
 import com.example.afinal.dataResponse.Movie;
 import com.example.afinal.internet.ApiConfig;
 import com.example.afinal.internet.NetworkUtil;
+import com.example.afinal.models.MovieModel;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class MovieFragment extends Fragment {
+public class MovieFragment extends Fragment{
     private AdapterMovie adapterMovie;
     RecyclerView rv;
     private LinearLayout ll_reload;
     private ProgressBar progressBar;
-
+    private List<MovieModel> datamodel;
+    private List<MovieModel> filteredData;
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -43,6 +51,7 @@ public class MovieFragment extends Fragment {
         ll_reload = view.findViewById(R.id.reload);
         ImageView iv_loading = view.findViewById(R.id.loading);
         progressBar = view.findViewById(R.id.progressBar);
+        SearchView searchView = view.findViewById(R.id.searcview);
         adapterMovie = new AdapterMovie();
 
         ll_reload.setVisibility(View.GONE);
@@ -53,6 +62,36 @@ public class MovieFragment extends Fragment {
             progressBar.setVisibility(View.VISIBLE);
             fetchAPI();
         });
+
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                return false;
+            }
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                searchData(newText);
+                return true;
+            }
+        });
+    }
+
+    @SuppressLint("NotifyDataSetChanged")
+    private void searchData(String query) {
+        filteredData.clear();
+        if (TextUtils.isEmpty(query)) {
+            filteredData.addAll(datamodel);
+        } else {
+            String lowerCaseQuery = query.toLowerCase().trim();
+            for (MovieModel movie : datamodel) {
+                String title = movie.getTitle().toLowerCase();
+                if (title.startsWith(lowerCaseQuery)) {
+                    filteredData.add(movie);
+                }
+            }
+        }
+        adapterMovie.setFilteredList(filteredData);
+        adapterMovie.notifyDataSetChanged();
     }
 
     private void fetchAPI() {
@@ -61,7 +100,9 @@ public class MovieFragment extends Fragment {
                 @Override
                 public void onResponse(@NonNull Call<Movie> call, @NonNull Response<Movie> response) {
                     if (response.isSuccessful() && response.body() != null){
-                        adapterMovie.addUser(response.body().getMovie());
+                        datamodel = response.body().getMovie();
+                        filteredData = new ArrayList<>(datamodel);
+                        adapterMovie.setFilteredList(datamodel);
                         rv.setAdapter(adapterMovie);
                         int numberOfColumns = 2; // Jumlah kolom yang diinginkan
                         GridLayoutManager layoutManager = new GridLayoutManager(getActivity(), numberOfColumns);
@@ -82,4 +123,5 @@ public class MovieFragment extends Fragment {
             rv.setVisibility(View.GONE);
         }
     }
+
 }

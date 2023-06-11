@@ -11,7 +11,6 @@ import android.database.sqlite.SQLiteOpenHelper;
 import com.example.afinal.database.DatabaseContract;
 import com.example.afinal.database.DatabaseHelper;
 import com.example.afinal.models.FavoriteModel;
-import com.example.afinal.models.MovieModel;
 
 import java.util.ArrayList;
 
@@ -20,10 +19,9 @@ public class FavoriteHelper {
     private static DatabaseHelper databaseHelper;
     private static SQLiteDatabase database;
     private static volatile FavoriteHelper INSTANCE;
-    private FavoriteModel favoriteModel;
 
     private FavoriteHelper(Context context) {
-        databaseHelper = new DatabaseHelper(context);
+         databaseHelper = new DatabaseHelper(context);
     }
 
     public static FavoriteHelper getInstance(Context context) {
@@ -48,7 +46,7 @@ public class FavoriteHelper {
         }
     }
 
-    public ArrayList<FavoriteModel> getAllNotes() {
+    public ArrayList<FavoriteModel> getAllQuery() {
         ArrayList<FavoriteModel> notesList = new ArrayList<>();
         Cursor cursor = database.query(
                 DATABASE_TABLE,
@@ -61,43 +59,33 @@ public class FavoriteHelper {
         );
         cursor.moveToFirst();
         while (!cursor.isAfterLast()) {
-            FavoriteModel favoriteModel = getNotesFromCursor(cursor);
-            notesList.add(favoriteModel);
+            FavoriteModel favoriteMovieModel = getFromCursor(cursor);
+            notesList.add(favoriteMovieModel);
             cursor.moveToNext();
         }
         cursor.close();
         return notesList;
     }
 
-    private FavoriteModel getNotesFromCursor(Cursor cursor) {
+    private FavoriteModel getFromCursor(Cursor cursor) {
         FavoriteModel favoriteModel = new FavoriteModel();
-        favoriteModel.setId(cursor.getInt(cursor.getColumnIndexOrThrow(DatabaseContract.FavoriteColumns._ID)));
+        favoriteModel.setId(Integer.parseInt(cursor.getString(cursor.getColumnIndexOrThrow(DatabaseContract.FavoriteColumns._ID))));
         favoriteModel.setJudul(cursor.getString(cursor.getColumnIndexOrThrow(DatabaseContract.FavoriteColumns.TITLE)));
         favoriteModel.setTahun(cursor.getString(cursor.getColumnIndexOrThrow(DatabaseContract.FavoriteColumns.TAHUN)));
         favoriteModel.setPoster(cursor.getString(cursor.getColumnIndexOrThrow(DatabaseContract.FavoriteColumns.POSTER)));
-        favoriteModel.setJenis(cursor.getInt(cursor.getColumnIndexOrThrow(DatabaseContract.FavoriteColumns.JENIS)));
+        favoriteModel.setJenis(Integer.parseInt(cursor.getString(cursor.getColumnIndexOrThrow(DatabaseContract.FavoriteColumns.JENIS))));
         favoriteModel.setBackdrop(cursor.getString(cursor.getColumnIndexOrThrow(DatabaseContract.FavoriteColumns.BACKDROP)));
-        favoriteModel.setSinopsis(cursor.getString(cursor.getColumnIndexOrThrow(DatabaseContract.FavoriteColumns.SINOPSIS)));
         favoriteModel.setVote(cursor.getString(cursor.getColumnIndexOrThrow(DatabaseContract.FavoriteColumns.VOTE)));
-        return favoriteModel;
+        favoriteModel.setSinopsis(cursor.getString(cursor.getColumnIndexOrThrow(DatabaseContract.FavoriteColumns.SINOPSIS)));
+       return favoriteModel;
     }
 
     public static long insert(ContentValues values) {
         return database.insert(DATABASE_TABLE, null, values);
     }
 
-    public static int update(String id, ContentValues values) {
-        return database.update(DATABASE_TABLE, values, DatabaseContract.FavoriteColumns._ID
-                + " = ?", new String[]{id});
-    }
-
-    public int deleteById(String id) {
-        return database.delete(DATABASE_TABLE, DatabaseContract.FavoriteColumns._ID + " = "
-                + id, null);
-    }
-
     @SuppressLint("Range")
-    public ArrayList<FavoriteModel> searchNotes(String searchText) {
+    public ArrayList<FavoriteModel> searchData(String searchText) {
         ArrayList<FavoriteModel> searchResults = new ArrayList<>();
 
         SQLiteDatabase db = databaseHelper.getReadableDatabase();
@@ -106,8 +94,8 @@ public class FavoriteHelper {
 
         if (cursor != null && cursor.getCount() > 0) {
             while (cursor.moveToNext()) {
-                FavoriteModel favoriteModel = getNotesFromCursor(cursor);
-                searchResults.add(favoriteModel);
+                FavoriteModel favoriteMovieModel = getFromCursor(cursor);
+                searchResults.add(favoriteMovieModel);
             }
         }
 
@@ -118,11 +106,23 @@ public class FavoriteHelper {
         return searchResults;
     }
 
-    public void insertToFavorite(MovieModel movieModel){
-//        SQLiteDatabase db = databaseHelper.getReadableDatabase();
-//        values.put(DatabaseContract.FavoriteColumns.TITLE, favoriteModel.getJudul());
-//        values.put(DatabaseContract.FavoriteColumns.POSTER, favoriteModel.getPoster());
-//        values.put(DatabaseContract.FavoriteColumns.TAHUN, favoriteModel.getTahun());
-//        values.put(DatabaseContract.FavoriteColumns.JENIS, favoriteModel.getJenis());
+    public boolean checkDataExists(String title) {
+        SQLiteDatabase db = databaseHelper.getReadableDatabase();
+        String[] projection = {DatabaseContract.FavoriteColumns._ID};
+        String selection = DatabaseContract.FavoriteColumns.TITLE + " = ?";
+        String[] selectionArgs = {title};
+        Cursor cursor = db.query(DatabaseContract.TABLE_NAME, projection, selection, selectionArgs, null, null, null);
+        boolean exists = cursor != null && cursor.moveToFirst();
+        if (cursor != null) {
+            cursor.close();
+        }
+        return exists;
+    }
+
+    public int deleteBytitle(String title) {
+        SQLiteDatabase db = databaseHelper.getWritableDatabase();
+        String whereClause = DatabaseContract.FavoriteColumns.TITLE + " = ?";
+        String[] whereArgs = {title};
+        return db.delete(DatabaseContract.TABLE_NAME, whereClause, whereArgs);
     }
 }

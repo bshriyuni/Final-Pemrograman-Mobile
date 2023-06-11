@@ -7,9 +7,7 @@ import android.os.Looper;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.LinearLayout;
-import android.widget.ProgressBar;
-import android.widget.Toast;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -30,7 +28,8 @@ import java.util.concurrent.Executors;
 public class FavoriteFragment extends Fragment {
     AdapterFavorite adapterFavorite;
     RecyclerView rv;
-    private ArrayList<FavoriteModel> favoriteModels;
+    private ArrayList<FavoriteModel> favoriteMovieModel;
+    private FavoriteHelper favoriteHelper;
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -42,8 +41,7 @@ public class FavoriteFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
 
         rv = view.findViewById(R.id.rv_favorite);
-        LinearLayout ll_reload = view.findViewById(R.id.reload);
-        ProgressBar progressBar = view.findViewById(R.id.progressBar);
+        TextView tv_add = view.findViewById(R.id.tv_addfirst);
 
         adapterFavorite = new AdapterFavorite();
         rv.setAdapter(adapterFavorite);
@@ -51,16 +49,16 @@ public class FavoriteFragment extends Fragment {
 
         new LoadStudentsAsync(getActivity(), fav -> {
             if (fav.size() > 0) {
-                favoriteModels = fav;
+                favoriteMovieModel = fav;
             } else {
-                favoriteModels = null;
+                favoriteMovieModel = null;
             }
-            if (favoriteModels != null){
-                showCurrentUser(favoriteModels);
+            if (favoriteMovieModel != null){
+                showCurrentUser(favoriteMovieModel);
+                tv_add.setVisibility(View.GONE);
             }
             else {
                 showCurrentUser(new ArrayList<>());
-                Toast.makeText(getActivity(), "kosong?", Toast.LENGTH_SHORT).show();
             }
 
         }).execute();
@@ -84,7 +82,7 @@ public class FavoriteFragment extends Fragment {
                 Context context = weakContext.get();
                 FavoriteHelper favoriteHelper = FavoriteHelper.getInstance(context);
                 favoriteHelper.open();
-                ArrayList<FavoriteModel> favList = favoriteHelper.getAllNotes();
+                ArrayList<FavoriteModel> favList = favoriteHelper.getAllQuery();
                 favoriteHelper.close();
                 handler.post(() -> weakCallback.get().postExecute(favList));
             });

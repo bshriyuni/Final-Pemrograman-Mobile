@@ -1,14 +1,8 @@
 package com.example.afinal.fragment;
 
+import android.annotation.SuppressLint;
 import android.os.Bundle;
-
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.fragment.app.Fragment;
-import androidx.recyclerview.widget.GridLayoutManager;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -16,13 +10,23 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
+import android.widget.SearchView;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.GridLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.afinal.R;
 import com.example.afinal.adapter.AdapterTvShow;
-import com.example.afinal.dataResponse.Movie;
 import com.example.afinal.dataResponse.Tvshow;
 import com.example.afinal.internet.ApiConfig;
 import com.example.afinal.internet.NetworkUtil;
+import com.example.afinal.models.TvShowModel;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -32,8 +36,9 @@ public class TvshowFragment extends Fragment {
     AdapterTvShow adapterTvShow;
     RecyclerView rv;
     private LinearLayout ll_reload;
-    private ImageView iv_loading;
     private ProgressBar progressBar;
+    private List<TvShowModel> datamodel;
+    private List<TvShowModel> filteredData;
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -45,7 +50,8 @@ public class TvshowFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
         rv = view.findViewById(R.id.rv_tv);
         ll_reload = view.findViewById(R.id.reload);
-        iv_loading = view.findViewById(R.id.loading);
+        ImageView iv_loading = view.findViewById(R.id.loading);
+        SearchView searchView = view.findViewById(R.id.searcview);
         progressBar = view.findViewById(R.id.progressBar);
         adapterTvShow = new AdapterTvShow();
 
@@ -53,21 +59,48 @@ public class TvshowFragment extends Fragment {
         progressBar.setVisibility(View.VISIBLE);
 
         fetchAPI();
-        iv_loading.setOnClickListener(new View.OnClickListener() {
+        iv_loading.setOnClickListener(view1 -> fetchAPI());
+
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
-            public void onClick(View view) {
-                fetchAPI();
+            public boolean onQueryTextSubmit(String query) {
+                return false;
+            }
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                searchData(newText);
+                return true;
             }
         });
     }
 
+    @SuppressLint("NotifyDataSetChanged")
+    private void searchData(String query) {
+        filteredData.clear();
+        if (TextUtils.isEmpty(query)) {
+            filteredData.addAll(datamodel);
+        } else {
+            String lowerCaseQuery = query.toLowerCase().trim();
+            for (TvShowModel tvshow : datamodel) {
+                String title = tvshow.getName().toLowerCase();
+                if (title.startsWith(lowerCaseQuery)) {
+                    filteredData.add(tvshow);
+                }
+            }
+        }
+        adapterTvShow.setFilteredList(filteredData);
+        adapterTvShow.notifyDataSetChanged();
+    }
+
     private void fetchAPI() {
-        if (NetworkUtil.isNetworkAvailable(getActivity())){
+        if (NetworkUtil.isNetworkAvailable(requireActivity())){
             ApiConfig.getApiService().getTvshow(ApiConfig.getApiKey()).enqueue(new Callback<Tvshow>(){
                 @Override
-                public void onResponse(Call<Tvshow> call, Response<Tvshow> response) {
+                public void onResponse(@NonNull Call<Tvshow> call, @NonNull Response<Tvshow> response) {
                     if (response.isSuccessful() && response.body() != null){
-                        adapterTvShow.addUser(response.body().getTvshow());
+                        datamodel = response.body().getTvshow();
+                        filteredData = new ArrayList<>(datamodel);
+                        adapterTvShow.setFilteredList(datamodel);
                         rv.setAdapter(adapterTvShow);
                         int numberOfColumns = 2; // Jumlah kolom yang diinginkan
                         GridLayoutManager layoutManager = new GridLayoutManager(getActivity(), numberOfColumns);
@@ -78,7 +111,7 @@ public class TvshowFragment extends Fragment {
                     }
                 }
                 @Override
-                public void onFailure(Call<Tvshow> call, Throwable t) {
+                public void onFailure(@NonNull Call<Tvshow> call, @NonNull Throwable t) {
                     Log.e("MainActivity", "onFailure: " + t.getMessage());
                 }
             });

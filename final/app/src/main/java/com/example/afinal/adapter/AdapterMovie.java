@@ -1,5 +1,6 @@
 package com.example.afinal.adapter;
 
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -19,9 +20,15 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class AdapterMovie extends RecyclerView.Adapter<AdapterMovie.ViewHolder> {
-    private final List<MovieModel> datamovie = new ArrayList<>();
-    public void addUser (List<MovieModel> datamovie) {
-        this.datamovie.addAll(datamovie);
+    private List<MovieModel> datamovie = new ArrayList<>();
+
+    public AdapterMovie() {
+    }
+
+    @SuppressLint("NotifyDataSetChanged")
+    public void setFilteredList(List<MovieModel> filteredList) {
+        datamovie = filteredList;
+        notifyDataSetChanged();
     }
     @NonNull
     @Override

@@ -41,7 +41,6 @@ public class AdapterFavorite extends RecyclerView.Adapter<AdapterFavorite.ViewHo
         FavoriteModel favoriteModel = datafavorite.get(position);
         holder.tv_judul.setText(favoriteModel.getJudul());
         holder.iv_label.setImageResource(favoriteModel.getJenis());
-
         String releaseDate = favoriteModel.getTahun();
         if (releaseDate != null && !releaseDate.isEmpty()) {
             String year = releaseDate.substring(0, 4);
@@ -49,7 +48,6 @@ public class AdapterFavorite extends RecyclerView.Adapter<AdapterFavorite.ViewHo
         } else {
             holder.tv_tahun.setText("");
         }
-
         String posterUrl = "https://image.tmdb.org/t/p/w500" + favoriteModel.getPoster();
         Glide.with(holder.iv_poster.getContext())
                 .load(posterUrl)
